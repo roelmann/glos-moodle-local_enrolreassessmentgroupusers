@@ -113,9 +113,9 @@ class enrolreassessmentgroupusers extends \core\task\scheduled_task {
         $groups = array();
         $users = array();
         // Query to get all reassessment groups.
-        $groupdata = $DB->get_records_sql("SELECT * FROM {groups} WHERE name LIKE 'LE6905%/20%-R'");
+        $groupdata = $DB->get_records_sql("SELECT * FROM {groups} WHERE name LIKE '%2019/20%-R'");
         // Query to get all user records.
-        $moodleusers = $DB->get_records_sql("SELECT * FROM {user} WHERE confirmed = 1 AND deleted != 1 
+        $moodleusers = $DB->get_records_sql("SELECT * FROM {user} WHERE confirmed = 1 AND deleted != 1
                                                 AND email LIKE '%@connect.glos.ac.uk'");
         // Gets the groups from the reassessment group table in the integrations database.
         $sql = "SELECT * FROM " . $grouptab;
@@ -163,7 +163,6 @@ class enrolreassessmentgroupusers extends \core\task\scheduled_task {
             // Loops through the moodle reassessment groups and compares these.
             foreach ($groupdata as $data) {
                 $groupid = $data->id;
-                echo "\n" .'groupid : ' .$groupid ."\n";
                 // If the group exists in both the integrations reassessment table and the groups table then go on
                 // to check the users.
                 if ($data->name == $group['group_name']) {
@@ -180,7 +179,6 @@ class enrolreassessmentgroupusers extends \core\task\scheduled_task {
                         // Add the s to the start of the student code as required to match with username
                         // in user table in moodle.
                         $user['student_code'] = "s" . $stu_idnumber;
-                        echo "\n" .'user if in array : ' .$user['student_code'] ."\n";
                         // Loop through moodle users.
                         // Checks to see if the user exists in both the integrations database student
                         // assessment table and the moodle user table.
@@ -192,7 +190,7 @@ class enrolreassessmentgroupusers extends \core\task\scheduled_task {
                             // echo 'in_array : ' .$user['student_code'] .' | ' .$mu ."\n";
                             $username = $user['student_code'];
                             $user['id'] = $muid[$username];
-                            echo "\n" .'user if in array : ' .$username ."\n";
+                            // echo '\n user if in array : ' .$user .'\n';
                             // Check to make sure user id is not empty.
                             if (!(empty($user['id'] ) )) {
                                 // Additional check to make sure neither group id or user id are set to null.
@@ -200,7 +198,7 @@ class enrolreassessmentgroupusers extends \core\task\scheduled_task {
                                     // Convert both numbers to integer in case these are strings.
                                     $data->id = intval($data->id);
                                     $user['id'] = intval($user['id']);
-                                    echo "\n" .'user if not empty : ' .$user[id] ."\n";
+                                    // echo '\n user if not empty : ' .$user .'\n';
                                     // User moodle built in function to add group members to the required groups by
                                     // passing in the group id as data->id and the user id as $user['id'].
                                     groups_add_member($data->id, $user['id']);
